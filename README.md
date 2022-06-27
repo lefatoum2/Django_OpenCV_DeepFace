@@ -3,6 +3,7 @@ Pour ce projet web , j'ai eu envie de combiner OpenCv pour la camera  et la libr
 ## Installation
 ![img7](https://miro.medium.com/max/770/1*rdqg4t9PAeO13tBk9JNpHw.png)
 ```
+
 pipenv shell
 pip install django opencv-python
 pip install deepface
