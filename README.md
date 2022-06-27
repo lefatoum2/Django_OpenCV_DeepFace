@@ -1,8 +1,11 @@
+## Sujet 
+Pour ce projet web , j'ai eu envie de combiner OpenCv pour la camera  et la librairie de reconnaissance de Facebook, DeepFace dans une page web.
 ## Installation
-
+![img7](https://miro.medium.com/max/770/1*rdqg4t9PAeO13tBk9JNpHw.png)
 ```
 pipenv shell
 pip install django opencv-python
+pip install deepface
 ```
 
 
@@ -86,6 +89,42 @@ class VideoCamera(object):
         ret, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
 ```
+camera/camera2.py :
+```py
+import cv2
+from deepface import DeepFace
+ds_factor=0.6
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+
+
+
+
+class VideoCamera2(object):
+    def __init__(self):
+        self.video = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    
+    def __del__(self):
+        self.video.release()
+
+    def get_frame(self):
+        _, frame = self.video.read()
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        face = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+
+        for x, y, w, h in face:
+            image = cv2.rectangle(frame, (x, y), (x + w, y + h), (89, 2, 236), 1)
+            try:
+                analyze = DeepFace.analyze(frame, actions=['emotion'])
+                cv2.putText(image, analyze['dominant_emotion'], (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (224, 77, 176), 2)
+                print(analyze['dominant_emotion'])
+            except:
+                print('no face')
+            
+        ret, jpeg = cv2.imencode('.jpg', frame)
+        return jpeg.tobytes()
+```
+
 
 face_api/urls.py:
 ```py
@@ -121,7 +160,7 @@ from django.http import HttpResponse , StreamingHttpResponse ,request
 
 
 from .camera import VideoCamera
-
+from .camera2 import VideoCamera2
 
 
 
@@ -133,13 +172,13 @@ def gen(camera):
 
 def camera_live(request):
     try:
-        return StreamingHttpResponse(gen(VideoCamera()), content_type="multipart/x-mixed-replace;boundary=frame")
+        return StreamingHttpResponse(gen(VideoCamera2()), content_type="multipart/x-mixed-replace;boundary=frame")
     except:  
         pass
 
 class Camera(View):
     template_name = 'camera.html'
-    word = 'ได้เขียน django แล้ว'
+    word = 'MVOGO World'
 
     def get(self, request):
         context = {
@@ -153,4 +192,8 @@ class Camera(View):
 http://127.0.0.1:8000/
 ```
 
+## Résultats
 
+![img3](./images/angry.png)
+![img4](./images/happy.png)
+![img5](./images/neutral.png)

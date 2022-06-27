@@ -4,7 +4,7 @@ from django.http import HttpResponse , StreamingHttpResponse ,request
 
 
 from .camera import VideoCamera
-
+from .camera2 import VideoCamera2
 
 
 
@@ -16,7 +16,7 @@ def gen(camera):
 
 def camera_live(request):
     try:
-        return StreamingHttpResponse(gen(VideoCamera()), content_type="multipart/x-mixed-replace;boundary=frame")
+        return StreamingHttpResponse(gen(VideoCamera2()), content_type="multipart/x-mixed-replace;boundary=frame")
     except:  
         pass
 
